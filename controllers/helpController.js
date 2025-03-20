@@ -22,7 +22,7 @@ export const createHelp = async (req, res) => {
         redisClient.del(String(help._id))
     })
     //close duplicate / older active helps
-    await helpModel.updateMany({active: true, phone: currentUser.phone}, {active: false})
+    await helpModel.updateMany({active: true, phone: currentUser.phone}, {active: false, status: "user closed"})
 
     const newHelp = new helpModel({
         userId: currentUser._id,
