@@ -12,6 +12,9 @@ const helpSchema = new mongoose.Schema(
         status:{
             type: String,
         },
+        accessKey:{
+            type: String
+        }
     },
     {
         timestamps: true,
