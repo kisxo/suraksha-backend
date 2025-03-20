@@ -9,6 +9,11 @@ const helpSchema = new mongoose.Schema(
         phone:{
             type: String,
         },
+        //active or closed
+        active:{
+            type: Boolean,
+        },
+        //new, pending, dispatched, user_closed, admin_closed
         status:{
             type: String,
         },

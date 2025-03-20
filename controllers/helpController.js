@@ -19,7 +19,8 @@ export const createHelp = async (req, res) => {
     const newHelp = new helpModel({
         userId: currentUser._id,
         phone: currentUser.phone,
-        status: "New",
+        active: true,
+        status: "new"
     });
 
     await newHelp.save();
