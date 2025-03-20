@@ -4,6 +4,12 @@ export const createUser = async (req, res) => {
     try {
     const { name, phone, address, contacts, gender, photo} = req.body;
 
+    const currentUser = await userModel.findOne({ phone: phone });
+    if(currentUser)
+    {
+        return res.status(400).send({success: false, message: "User already exists."});
+    }
+
     const newUser = new userModel({
         name,
         phone,
