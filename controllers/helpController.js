@@ -47,10 +47,10 @@ export const listHelps = async (req, res) => {
 
 export const getHelp = async (req, res) => {
     try {
+        const helpId = req.params.helpId;
+        const helpInDb = await helpModel.findById(helpId)
 
-        // const helpList = await helpModel.find({});
-
-    return res.status(200).send({success: true, message: "Help got successfull"});
+    return res.status(200).send({success: true, data:helpInDb, message: "Help got successfull"});
 
     } catch (error) {
         return res.status(500).send({ success: false, message: error.message });
