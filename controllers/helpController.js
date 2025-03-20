@@ -1,4 +1,3 @@
-import * as crypto from "node:crypto";
 import helpModel from "../models/helpModel.js";
 import userModel from "../models/userModel.js";
 
@@ -17,7 +16,6 @@ export const createHelp = async (req, res) => {
     const newHelp = new helpModel({
         userId: currentUser._id,
         phone: currentUser.phone,
-        accessKey: crypto.randomBytes(20).toString('hex'),
         status: "New",
     });
 
@@ -25,7 +23,6 @@ export const createHelp = async (req, res) => {
 
     const data = {
         id: newHelp._id,
-        access_key: newHelp.accessKey
     }
 
     return res.status(200).send({success: true, data: data, message: "Help created successfull."});
@@ -42,6 +39,18 @@ export const listHelps = async (req, res) => {
         const helpList = await helpModel.find({});
 
     return res.status(200).send({success: true, message: "Help List successfull", data: helpList});
+
+    } catch (error) {
+        return res.status(500).send({ success: false, message: error.message });
+    }
+}
+
+export const getHelp = async (req, res) => {
+    try {
+
+        // const helpList = await helpModel.find({});
+
+    return res.status(200).send({success: true, message: "Help got successfull"});
 
     } catch (error) {
         return res.status(500).send({ success: false, message: error.message });
