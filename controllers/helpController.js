@@ -16,6 +16,14 @@ export const createHelp = async (req, res) => {
         return res.status(404).send({success: false, message: "User not found."});
     }
 
+    //delete old help from redis
+    const helpList = await helpModel.find({active: true, phone: currentUser.phone})
+    helpList.forEach((help) => {
+        redisClient.del(String(help._id))
+    })
+    //close duplicate / older active helps
+    await helpModel.updateMany({active: true, phone: currentUser.phone}, {active: false})
+
     const newHelp = new helpModel({
         userId: currentUser._id,
         phone: currentUser.phone,
