@@ -2,6 +2,7 @@ import redisClient from "../config/redis.js";
 
 import helpModel from "../models/helpModel.js";
 import userModel from "../models/userModel.js";
+import locationModel from "../models/locationModel.js";
 
 
 export const createHelp = async (req, res) => {
@@ -83,20 +84,28 @@ export const logLocations = async (req, res) => {
             return res.status(404).send({ success: false, message: "Current help is not active" });
         }
 
+        //set current latitude and longitude
+        currentHelp.latitude = 55;
+        currentHelp.longitude = 56;
+
         //check if help counter is 12 ie (12 x 5 seconds = 1 minute) 
         //if its greater than 12 store the location point in database
         if (parseInt(currentHelp.counter) >= 12)
         {
             currentHelp.counter = 0
-            //TODO save location in Database
+
+            //save the location snapshot in database(every 1 minute)
+            const newLocation = new locationModel({
+                helpId: currentHelp.id,
+                latitude: currentHelp.latitude,
+                longitude: currentHelp.longitude,
+            });
+        
+            await newLocation.save();
         }else
         {   
             currentHelp.counter = parseInt(currentHelp.counter) + 1;
         }
-        
-
-        currentHelp.latitude = 55;
-        currentHelp.longitude = 56;
 
         await redisClient.hSet(currentHelp.id, currentHelp);
 
