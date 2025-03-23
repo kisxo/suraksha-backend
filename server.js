@@ -1,20 +1,12 @@
-import express from "express"
-import multer from "multer"
+import express from "express";
+import connectDB from "./config/database.js";
+import { configDotenv } from "dotenv";
+
+// dotenv
+configDotenv();
+connectDB();
 const app = express()
 app.use(express.json())
-
-
-import database from "./config/database.js"
-
-import fs from 'node:fs';
-
-const folderName = process.cwd() + '/Users/uploads';
-
-
-import storage from "./config/multer.js"
-
-const upload = multer({ storage: storage })
-
 
 import userRouter from "./router/userRoutes.js";
 app.use("/api/users/", userRouter);
@@ -25,6 +17,4 @@ app.use("/api/helps/", helpRouter);
 
 app.listen(3000, () => {
 	console.log("listen");
-
-	database()
 })
