@@ -18,5 +18,5 @@ const locationSchema = new mongoose.Schema(
     }
 )
 
-const locationModel = mongoose.model('location', locationSchema);
+const locationModel = mongoose.model('locations', locationSchema);
 export default locationModel;

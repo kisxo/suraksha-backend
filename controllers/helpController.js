@@ -25,7 +25,7 @@ export const createHelp = async (req, res) => {
     await helpModel.updateMany({active: true, phone: currentUser.phone}, {active: false, status: "user closed"})
 
     const newHelp = new helpModel({
-        userId: currentUser._id,
+        user: currentUser._id,
         phone: currentUser.phone,
         active: true,
         status: "new"
@@ -57,7 +57,7 @@ export const createHelp = async (req, res) => {
 export const listHelps = async (req, res) => {
     try {
 
-        const helpList = await helpModel.find({});
+        const helpList = await helpModel.find({}).populate('user')
 
     return res.status(200).send({success: true, message: "Help List successfull", data: helpList});
 

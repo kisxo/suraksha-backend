@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 
 const helpSchema = new mongoose.Schema(
     {
-        userId: {
-            type: String,
-            default: null,
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'users',
         },
         phone:{
             type: String,
@@ -23,5 +23,5 @@ const helpSchema = new mongoose.Schema(
     }
 )
 
-const helpModel = mongoose.model('help', helpSchema);
+const helpModel = mongoose.model('helps', helpSchema);
 export default helpModel;
