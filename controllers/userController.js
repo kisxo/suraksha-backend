@@ -1,19 +1,23 @@
 import userModel from "../models/userModel.js";
 import redisClient from "../config/redis.js";
 import { sendWhatsapp } from "../utils/notification.js";
-import { checkPhone, generateOTP } from "../utils/security.js";
+import { checkPhone, generateAccessToken, generateOTP, verifyToken, verifyOtp} from "../utils/security.js";
 
 export const createUser = async (req, res) => {
     try {
-    const { name, phone, address, contacts, gender, photo, token} = req.body;
+    const { name, phone, address, contacts, gender, photo, otp} = req.body;
 
-    if(!token)
+    const parsed_phone = checkPhone(phone);
+    if(!parsed_phone)
     {
-        return res.status(402).send({success: false, message: "Please provide a token"});
+        return res.status(402).send({success: false, message: "Invalid Phone Number"});
     }
-
-    return res.status(402).send(redisClient.get(`token-${phone}`));
-
+    
+    if(await verifyOtp(phone, otp) != true)
+    {
+        return res.status(400).send({success: false, message: "Invalid otp"});
+    }
+    
     const currentUser = await userModel.findOne({ phone: phone });
     if(currentUser)
     {
@@ -26,7 +30,7 @@ export const createUser = async (req, res) => {
         address,
         contacts,
         gender,
-        photo
+        photo,
     });
 
     await newUser.save();

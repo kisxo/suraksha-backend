@@ -1,4 +1,7 @@
 export function sendWhatsapp(phone, message){
+
+    console.log(phone, message)
+    return
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
     
