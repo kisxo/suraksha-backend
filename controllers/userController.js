@@ -127,3 +127,15 @@ export const sendOtp = async (req, res) => {
         return res.status(500).send({ success: false, message: error.message });
     }
 }
+
+export const getUserByToken = async (req, res) => {
+    try {
+        const { token } = req.body;
+        const user = await userModel.findOne({ token });
+
+    return res.status(200).send({success: true, message: "User got successfull", data: user});
+
+    } catch (error) {
+        return res.status(500).send({ success: false, message: error.message });
+    }
+}
