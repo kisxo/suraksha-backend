@@ -4,7 +4,6 @@ import { Server } from "socket.io";
 import connectDB from "./config/database.js";
 import { configDotenv } from "dotenv";
 import cors from "cors";
-import { handleSocketConnection } from "./socket.js";
 
 // dotenv
 configDotenv();
@@ -25,8 +24,11 @@ app.use("/api/users/", userRouter);
 import helpRouter from "./router/helpRoutes.js"
 app.use("/api/helps/", helpRouter);
 
+import mediaRouter from "./router/mediaRoutes.js";
+app.use("/api/images", mediaRouter);
 
-io.on('connection', (socket) => handleSocketConnection(socket, io))
+
+// io.on('connection', (socket) => handleSocketConnection(socket, io))
   
 httpServer.listen(3000, () => {
 	console.log(`Listening on port 3000`);
