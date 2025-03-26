@@ -1,4 +1,5 @@
 import userModel from "../models/userModel.js";
+import helpModel from "../models/helpModel.js";
 import redisClient from "../config/redis.js";
 import { sendWhatsapp } from "../utils/notification.js";
 import { checkPhone, generateAccessToken, generateOTP, verifyToken, verifyOtp} from "../utils/security.js";
@@ -72,7 +73,19 @@ export const loginUser = async (req, res) => {
 
     // delete otp after signup
     redisClient.del(`otp-${phone}`)
-    
+
+    //update access token for old help from redis
+    const helpList = await helpModel.find({active: true, phone: currentUser.phone})
+
+    helpList.forEach(async (help) => {
+        let currentHelp = await redisClient.hGetAll(String(help._id));
+        if(currentHelp.id)
+        {
+            currentHelp.token = currentUser.token;
+            await redisClient.hSet(currentHelp.id, currentHelp);
+        }
+    })
+
     return res.status(200).send({success: true, message: "User login successfull.", data: {token}});
 
     } catch (error) {
