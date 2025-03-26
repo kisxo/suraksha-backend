@@ -26,9 +26,14 @@ app.use("/api/helps/", helpRouter);
 
 
 io.on('connection', (socket) => {
-	console.log('user connected');  socket.on('disconnect', function () {
-	  console.log('user disconnected');
-	});
+	const helpId = socket.handshake.query.helpId;
+
+    if (helpId) {
+        socket.join(helpId);
+    }
+	else{
+		socket.disconnect(true);
+	}
 })
   
 httpServer.listen(3000, () => {
