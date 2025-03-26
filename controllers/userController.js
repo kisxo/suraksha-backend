@@ -24,6 +24,7 @@ export const createUser = async (req, res) => {
         return res.status(400).send({success: false, message: "User already exists."});
     }
 
+    const token = generateAccessToken()
     const newUser = new userModel({
         name,
         phone,
@@ -31,11 +32,12 @@ export const createUser = async (req, res) => {
         contacts,
         gender,
         photo,
+        token
     });
 
     await newUser.save();
 
-    return res.status(200).send({success: true, message: "User create successfull."});
+    return res.status(200).send({success: true, message: "User create successfull.", data: {token}});
 
     } catch (error) {
         return res.status(500).send({ success: false, message: error.message });
