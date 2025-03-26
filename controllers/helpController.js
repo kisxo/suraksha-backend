@@ -7,9 +7,10 @@ import locationModel from "../models/locationModel.js";
 
 export const createHelp = async (req, res) => {
     try {
-    const { phone } = req.body;
-
-    const currentUser = await userModel.findOne({ phone: phone });
+    const { phone, token } = req.body;
+    
+    console.log(phone, token)
+    const currentUser = await userModel.findOne({ phone: phone, token: token});
 
     if (!currentUser)
     {
@@ -34,11 +35,12 @@ export const createHelp = async (req, res) => {
     await newHelp.save();
 
     const data = {
-        id: newHelp._id,
+        help_id: newHelp._id,
     }
 
     const redisData = {
         id: String(newHelp._id),
+        token: currentUser.token,
         counter: 0
     }
 
@@ -80,22 +82,34 @@ export const getHelp = async (req, res) => {
 
 export const logLocations = async (req, res) => {
     try {
-        const { helpId } = req.body;
+        const { helpId, token, latitude, longitude } = req.body;
         if(!helpId)
         {
             return res.status(400).send({ success: false, message: "Please provide a help id" });
         }
 
-        //check if the help id given is active help or not
+        //check if the help id given exists or not
         let currentHelp = await redisClient.hGetAll(helpId);
         if(!currentHelp.id)
         {
             return res.status(404).send({ success: false, message: "Current help is not active" });
         }
 
+        // match access token with help
+        if(currentHelp.token != token)
+        {
+            return res.status(403).send({ success: false, message: "Auth failed"});
+        }
+
+        // check latitude and longitude
+        if(longitude < -180 || longitude > 180 || latitude < -90 || latitude > 90)
+        {
+            return res.status(403).send({ success: false, message: "Invalid location"});
+        }
+
         //set current latitude and longitude
-        currentHelp.latitude = 55;
-        currentHelp.longitude = 56;
+        currentHelp.latitude = latitude;
+        currentHelp.longitude = longitude;
 
         //check if help counter is 12 ie (12 x 5 seconds = 1 minute) 
         //if its greater than 12 store the location point in database
@@ -105,7 +119,7 @@ export const logLocations = async (req, res) => {
 
             //save the location snapshot in database(every 1 minute)
             const newLocation = new locationModel({
-                helpId: currentHelp.id,
+                help: currentHelp.id,
                 latitude: currentHelp.latitude,
                 longitude: currentHelp.longitude,
             });

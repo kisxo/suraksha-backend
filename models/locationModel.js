@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 
 const locationSchema = new mongoose.Schema(
     {
-        helpId: {
-            type: String,
-            default: null,
+        help: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'helps',
         },
         latitude:{
             type: String,
