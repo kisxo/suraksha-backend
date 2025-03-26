@@ -4,6 +4,7 @@ import { Server } from "socket.io";
 import connectDB from "./config/database.js";
 import { configDotenv } from "dotenv";
 import cors from "cors";
+import { handleSocketConnection } from "./socket.js";
 
 // dotenv
 configDotenv();
@@ -25,16 +26,7 @@ import helpRouter from "./router/helpRoutes.js"
 app.use("/api/helps/", helpRouter);
 
 
-io.on('connection', (socket) => {
-	const helpId = socket.handshake.query.helpId;
-
-    if (helpId) {
-        socket.join(helpId);
-    }
-	else{
-		socket.disconnect(true);
-	}
-})
+io.on('connection', (socket) => handleSocketConnection(socket, io))
   
 httpServer.listen(3000, () => {
 	console.log(`Listening on port 3000`);
