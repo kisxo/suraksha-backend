@@ -37,13 +37,48 @@ export const createUser = async (req, res) => {
 
     await newUser.save();
 
+    // delete otp after signup
+    redisClient.del(`otp-${phone}`)
     return res.status(200).send({success: true, message: "User create successfull.", data: {token}});
 
     } catch (error) {
         return res.status(500).send({ success: false, message: error.message });
     }
 }
+export const loginUser = async (req, res) => {
+    try {
+    const { phone, otp} = req.body;
 
+    const parsed_phone = checkPhone(phone);
+    if(!parsed_phone)
+    {
+        return res.status(402).send({success: false, message: "Invalid Phone Number"});
+    }
+    
+    if(await verifyOtp(phone, otp) != true)
+    {
+        return res.status(400).send({success: false, message: "Invalid otp"});
+    }
+    
+    const currentUser = await userModel.findOne({ phone: phone });
+    if(! currentUser)
+    {
+        return res.status(400).send({success: false, message: "User not found."});
+    }
+
+    const token = generateAccessToken()
+    currentUser.token = token;
+    currentUser.save();
+
+    // delete otp after signup
+    redisClient.del(`otp-${phone}`)
+    
+    return res.status(200).send({success: true, message: "User login successfull.", data: {token}});
+
+    } catch (error) {
+        return res.status(500).send({ success: false, message: error.message });
+    }
+}
 
 export const listUsers = async (req, res) => {
     try {
