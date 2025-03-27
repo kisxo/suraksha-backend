@@ -3,14 +3,15 @@ import redisClient from "../config/redis.js";
 import helpModel from "../models/helpModel.js";
 import userModel from "../models/userModel.js";
 import locationModel from "../models/locationModel.js";
+import { sendMessageToRoom } from "../server.js";
 
 
 export const createHelp = async (req, res) => {
     try {
-    const { phone, token } = req.body;
+    const { token } = req.body;
     
-    console.log(phone, token)
-    const currentUser = await userModel.findOne({ phone: phone, token: token});
+    console.log("Create help", token)
+    const currentUser = await userModel.findOne({ token: token});
 
     if (!currentUser)
     {
@@ -129,10 +130,11 @@ export const logLocations = async (req, res) => {
         {   
             currentHelp.counter = parseInt(currentHelp.counter) + 1;
         }
-
+        console.log(currentHelp);
         await redisClient.hSet(currentHelp.id, currentHelp);
 
-    return res.status(200).send({ success: true });
+        sendMessageToRoom(currentHelp.id, currentHelp);
+        return res.status(200).send({ success: true });
 
     } catch (error) {
         console.log(error)
