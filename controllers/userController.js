@@ -139,3 +139,43 @@ export const getUserByToken = async (req, res) => {
         return res.status(500).send({ success: false, message: error.message });
     }
 }
+
+export const addContact = async (req, res) => {
+    try {
+        const { token, phone } = req.body;
+        const currentUser = await userModel.findOne({ token });
+
+        if(! currentUser)
+        {
+            return res.status(400).send({success: false, message: "User not found."});
+        }
+
+        currentUser.contacts.push(phone);
+        currentUser.save()
+
+    return res.status(200).send({success: true, message: "Contact add successfull"});
+
+    } catch (error) {
+        return res.status(500).send({ success: false, message: error.message });
+    }
+}
+
+export const removeContact = async (req, res) => {
+    try {
+        const { token, phone } = req.body;
+        const currentUser = await userModel.findOne({ token });
+
+        if(! currentUser)
+        {
+            return res.status(400).send({success: false, message: "User not found."});
+        }
+
+        currentUser.contacts.pop(phone);
+        currentUser.save()
+
+        return res.status(200).send({success: true, message: "Contact removed successfull"});
+
+    } catch (error) {
+        return res.status(500).send({ success: false, message: error.message });
+    }
+}
