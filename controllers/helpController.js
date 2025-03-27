@@ -81,6 +81,35 @@ export const getHelp = async (req, res) => {
     }
 }
 
+export const closeHelp = async (req, res) => {
+    try{
+        const { token } = req.body;
+        
+        console.log("close help", token)
+        const currentUser = await userModel.findOne({ token: token});
+
+        if (!currentUser)
+        {
+            return res.status(404).send({success: false, message: "User not found."});
+        }
+
+        //delete old help from redis
+        const helpList = await helpModel.find({active: true, phone: currentUser.phone})
+
+        helpList.forEach((help) => {
+            redisClient.del(String(help._id))
+        })
+        //close duplicate / older active helps
+
+        await helpModel.updateMany({active: true, phone: currentUser.phone}, {active: false, status: "user closed"})
+
+        return res.status(200).send({success: true, data:helpInDb, message: "Help closed successfull"});
+
+    } catch (error) {
+        return res.status(500).send({ success: false, message: error.message });
+    }
+}
+
 export const logLocations = async (req, res) => {
     try {
         const { helpId, token, latitude, longitude } = req.body;
